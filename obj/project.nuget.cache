@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "THq0vPI5zyq6kJ68FmsiKjH+XIzSWA6BaeRlQ5D0kXtLthQmxd+QoCVqND6sWwP4SXuyIEjTfUYrJp0hd8QLcg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\EzekielBajada\\Documents\\Code\\CurrencyExchange\\CurrencyExchange.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\EzekielBajada\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
+    "C:\\Users\\EzekielBajada\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\EzekielBajada\\.nuget\\packages\\swashbuckle.aspnetcore\\6.2.3\\swashbuckle.aspnetcore.6.2.3.nupkg.sha512",
+    "C:\\Users\\EzekielBajada\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.2.3\\swashbuckle.aspnetcore.swagger.6.2.3.nupkg.sha512",
+    "C:\\Users\\EzekielBajada\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.2.3\\swashbuckle.aspnetcore.swaggergen.6.2.3.nupkg.sha512",
+    "C:\\Users\\EzekielBajada\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.2.3\\swashbuckle.aspnetcore.swaggerui.6.2.3.nupkg.sha512"
+  ],
+  "logs": []
+}
