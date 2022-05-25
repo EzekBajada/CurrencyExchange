@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  currency-exchange-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "P@ssw0rd"
+    ports:
+      - 10433:1433
+
+  currency-exchange-backend:
+    build:
+      context: .
+      dockerfile: ./DockerFile
+    environment:
+      CurrencyExchange_ConnectionStrings__DefaultConnection: "Server=currency-exchange-db;Database=currencyexchange;User Id=sa;Password=P@ssw0rd;"
+    ports:
+      - 5000:80
+    depends_on:
+      - currency-exchange-db

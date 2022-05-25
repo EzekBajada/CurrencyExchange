@@ -1,5 +1,5 @@
 using System.Web;
-using CurrencyExchange.Models;
+using CurrencyExchange.Models.FixerIo;
 using CurrencyExchange.Models.Responses;
 
 namespace CurrencyExchange.Services;
