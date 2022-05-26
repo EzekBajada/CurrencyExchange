@@ -1,3 +1,5 @@
+using System;
+
 namespace CurrencyExchange.Models;
 
 public class CurrencyExchangeHistory

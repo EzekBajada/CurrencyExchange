@@ -1,6 +1,12 @@
+using CurrencyExchange.Contracts;
+using CurrencyExchange.DbContext;
 using CurrencyExchange.Models.FixerIo;
 using CurrencyExchange.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +19,8 @@ IConfiguration config = new ConfigurationBuilder()
 // Add services to the container.
 builder.Services.Configure<FixerIoSettings>(config.GetSection(nameof(FixerIoSettings)));
 builder.Services.AddSingleton<FixerIoSettings>(x => x.GetRequiredService<IOptions<FixerIoSettings>>().Value);
+builder.Services.AddScoped<IFixerIoService, FixerIoService>();
+builder.Services.AddScoped<IExchangeCurrencyService, ExchangeCurrencyService>();
 
 builder.Services.AddDbContext<CurrencyExchangeDbContext>(options =>
        options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
