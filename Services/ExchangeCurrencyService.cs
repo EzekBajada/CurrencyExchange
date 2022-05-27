@@ -5,12 +5,14 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
     private readonly CurrencyExchangeDbContext _dbContext;
     private readonly IFixerIoService _fixerIoService;
     private readonly ILogger<ExchangeCurrencyService> _logger;
+    private readonly IRedisService _redisService;
 
-    public ExchangeCurrencyService(CurrencyExchangeDbContext dbContext, IFixerIoService fixerIoService, ILogger<ExchangeCurrencyService> logger)
+    public ExchangeCurrencyService(CurrencyExchangeDbContext dbContext, IFixerIoService fixerIoService, ILogger<ExchangeCurrencyService> logger, IRedisService redisService)
     {
         _dbContext = dbContext;
         _fixerIoService = fixerIoService;
         _logger = logger;
+        _redisService = redisService;
     }
 
     public ExchangeCurrencyResponse ExchangeCurrencies(ExchangeCurrencyRequest request)

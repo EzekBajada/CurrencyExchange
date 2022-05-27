@@ -10,6 +10,7 @@ global using CurrencyExchange.Utilities;
 global using Microsoft.EntityFrameworkCore;
 
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,14 +22,16 @@ IConfiguration config = new ConfigurationBuilder()
 // Add services to the container.
 builder.Services.Configure<FixerIoSettings>(config.GetSection(nameof(FixerIoSettings)));
 builder.Services.AddSingleton<FixerIoSettings>(x => x.GetRequiredService<IOptions<FixerIoSettings>>().Value);
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(config.GetSection("Redis").Value));
+builder.Services.AddSingleton<IRedisService, RedisService>();
 builder.Services.AddScoped<IFixerIoService, FixerIoService>();
 builder.Services.AddScoped<IExchangeCurrencyService, ExchangeCurrencyService>();
 
 builder.Services.AddLogging(loggingBuilder =>
-{
-    var loggingSection = config.GetSection("Logging");
-    loggingBuilder.AddFile(loggingSection);
-});
+  {
+      var loggingSection = config.GetSection("Logging");
+      loggingBuilder.AddFile(loggingSection);
+  });
 
 builder.Services.AddDbContext<CurrencyExchangeDbContext>(options =>
        options.UseSqlServer(config.GetConnectionString("DefaultConnection")));

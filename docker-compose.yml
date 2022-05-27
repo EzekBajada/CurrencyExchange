@@ -1,6 +1,11 @@
 version: '3.4'
 
 services:
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+      
   currency-exchange-db:
     image: mcr.microsoft.com/mssql/server:2019-latest
     restart: unless-stopped
