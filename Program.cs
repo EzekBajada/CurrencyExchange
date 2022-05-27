@@ -1,12 +1,14 @@
-using CurrencyExchange.Contracts;
-using CurrencyExchange.DbContext;
-using CurrencyExchange.Models.FixerIo;
-using CurrencyExchange.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+global using System;
+global using CurrencyExchange.Contracts;
+global using CurrencyExchange.DbContext;
+global using CurrencyExchange.Models;
+global using CurrencyExchange.Models.FixerIo;
+global using CurrencyExchange.Models.Requests;
+global using CurrencyExchange.Models.Responses;
+global using CurrencyExchange.Services;
+global using CurrencyExchange.Utilities;
+global using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,12 @@ builder.Services.Configure<FixerIoSettings>(config.GetSection(nameof(FixerIoSett
 builder.Services.AddSingleton<FixerIoSettings>(x => x.GetRequiredService<IOptions<FixerIoSettings>>().Value);
 builder.Services.AddScoped<IFixerIoService, FixerIoService>();
 builder.Services.AddScoped<IExchangeCurrencyService, ExchangeCurrencyService>();
+
+builder.Services.AddLogging(loggingBuilder =>
+{
+    var loggingSection = config.GetSection("Logging");
+    loggingBuilder.AddFile(loggingSection);
+});
 
 builder.Services.AddDbContext<CurrencyExchangeDbContext>(options =>
        options.UseSqlServer(config.GetConnectionString("DefaultConnection")));

@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-
 namespace CurrencyExchange.Models.Responses;
 
-public class LatestExchangeRatesResponse
+public class LatestExchangeRatesResponse : BaseResponse
 {
-    public bool Success { get; set; }
-
     public long TimeStamp { get; set; }
 
     public string? Base { get; set; }

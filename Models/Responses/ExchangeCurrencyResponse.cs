@@ -1,10 +1,10 @@
 namespace CurrencyExchange.Models.Responses;
 
-public class ExchangeCurrencyResponse
+public record ConvertedCurrency(double? AmountConverted, string FromCurrency, string ToCurrency, double ExchangeRate);
+
+public class ExchangeCurrencyResponse : BaseResponse
 {
-    public int ClientId { get; set; }
+    public int? ClientId { get; set; }
 
-    public double AmountConverted { get; set; }
-
-    public bool IsSuccess { get; set; }
+    public List<ConvertedCurrency>? CurrenciesConverted { get; set; }
 }

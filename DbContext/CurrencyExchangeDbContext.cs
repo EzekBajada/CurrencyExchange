@@ -1,6 +1,3 @@
-using CurrencyExchange.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace CurrencyExchange.DbContext;
 
 public class CurrencyExchangeDbContext : Microsoft.EntityFrameworkCore.DbContext

@@ -1,5 +1,3 @@
-using CurrencyExchange.Models.Responses;
-
 namespace CurrencyExchange.Contracts;
 
 public interface IFixerIoService

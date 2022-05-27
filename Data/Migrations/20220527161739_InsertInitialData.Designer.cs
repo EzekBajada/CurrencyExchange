@@ -12,11 +12,12 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CurrencyExchange.Data.Migrations
 {
     [DbContext(typeof(CurrencyExchangeDbContext))]
-    [Migration("20220525214710_InsertInitialData")]
+    [Migration("20220527161739_InsertInitialData")]
     partial class InsertInitialData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
+#pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
@@ -50,11 +51,11 @@ namespace CurrencyExchange.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CurrencyExchangeHistoryId"), 1L, 1);
 
-                    b.Property<int>("AmountIn")
-                        .HasColumnType("int");
+                    b.Property<double>("AmountIn")
+                        .HasColumnType("float");
 
-                    b.Property<int>("AmountOut")
-                        .HasColumnType("int");
+                    b.Property<double>("AmountOut")
+                        .HasColumnType("float");
 
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
@@ -70,8 +71,22 @@ namespace CurrencyExchange.Data.Migrations
 
                     b.HasKey("CurrencyExchangeHistoryId");
 
+                    b.HasIndex("ClientId");
+
                     b.ToTable("CurrencyExchangeHistories");
                 });
+
+            modelBuilder.Entity("CurrencyExchange.Models.CurrencyExchangeHistory", b =>
+                {
+                    b.HasOne("CurrencyExchange.Models.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+#pragma warning restore 612, 618
         }
     }
 }

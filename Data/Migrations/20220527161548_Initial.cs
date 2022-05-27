@@ -32,23 +32,34 @@ namespace CurrencyExchange.Data.Migrations
                     ClientId = table.Column<int>(type: "int", nullable: false),
                     FromCurrency = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ToCurrency = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AmountIn = table.Column<int>(type: "int", nullable: false),
-                    AmountOut = table.Column<int>(type: "int", nullable: false),
+                    AmountIn = table.Column<double>(type: "float", nullable: false),
+                    AmountOut = table.Column<double>(type: "float", nullable: false),
                     ExecutedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CurrencyExchangeHistories", x => x.CurrencyExchangeHistoryId);
+                    table.ForeignKey(
+                        name: "FK_CurrencyExchangeHistories_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CurrencyExchangeHistories_ClientId",
+                table: "CurrencyExchangeHistories",
+                column: "ClientId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Clients");
+                name: "CurrencyExchangeHistories");
 
             migrationBuilder.DropTable(
-                name: "CurrencyExchangeHistories");
+                name: "Clients");
         }
     }
 }
