@@ -59,15 +59,14 @@ public class FixerIoService : IFixerIoService
     private static Uri BuildUri(string endPointUri, Dictionary<string, string>? parameters)
     {
         var uriBuilder = new UriBuilder(endPointUri);
-        if (parameters != null && parameters.Any())
+        if (parameters == null || !parameters.Any()) return uriBuilder.Uri;
+        
+        var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+        foreach (var param in parameters)
         {
-            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-            foreach (var param in parameters)
-            {
-                query[param.Key] = param.Value;
-            }
-            uriBuilder.Query = query.ToString();
+            query[param.Key] = param.Value;
         }
+        uriBuilder.Query = query.ToString();
 
         return uriBuilder.Uri;
     }

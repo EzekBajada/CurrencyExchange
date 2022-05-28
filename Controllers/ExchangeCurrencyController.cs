@@ -18,8 +18,6 @@ public class ExchangeCurrencyController : ControllerBase
     {
         var response = _exchangeCurrencyService.ExchangeCurrencies(request);
 
-        if (!response.Success) return StatusCode(500, response);
-
-        return Ok(response);
+        return !response.Success ? StatusCode(500, response) : Ok(response);
     }
 }

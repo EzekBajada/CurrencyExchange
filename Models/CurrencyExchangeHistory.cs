@@ -12,7 +12,7 @@ public class CurrencyExchangeHistory
 
     public string? ToCurrency { get; set; }
 
-    public double ExchangRate { get; set; }
+    public double ExchangeRate { get; set; }
 
     public double? AmountIn { get; set; }
 

@@ -6,5 +6,5 @@ public class ExchangeCurrencyResponse : BaseResponse
 {
     public int? ClientId { get; set; }
 
-    public List<ConvertedCurrency>? CurrenciesConverted { get; set; }
+    public ConvertedCurrency? CurrencyConverted { get; set; }
 }

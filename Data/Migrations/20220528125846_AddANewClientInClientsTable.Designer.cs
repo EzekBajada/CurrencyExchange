@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CurrencyExchange.Data.Migrations
 {
     [DbContext(typeof(CurrencyExchangeDbContext))]
-    [Migration("20220527165557_AddColumnExchangeRate")]
-    partial class AddColumnExchangeRate
+    [Migration("20220528125846_AddANewClientInClientsTable")]
+    partial class AddANewClientInClientsTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -51,13 +51,13 @@ namespace CurrencyExchange.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CurrencyExchangeHistoryId"), 1L, 1);
 
-                    b.Property<double>("AmountIn")
+                    b.Property<double?>("AmountIn")
                         .HasColumnType("float");
 
-                    b.Property<double>("AmountOut")
+                    b.Property<double?>("AmountOut")
                         .HasColumnType("float");
 
-                    b.Property<int>("ClientId")
+                    b.Property<int?>("ClientId")
                         .HasColumnType("int");
 
                     b.Property<double>("ExchangeRate")
@@ -83,9 +83,7 @@ namespace CurrencyExchange.Data.Migrations
                 {
                     b.HasOne("CurrencyExchange.Models.Client", "Client")
                         .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClientId");
 
                     b.Navigation("Client");
                 });

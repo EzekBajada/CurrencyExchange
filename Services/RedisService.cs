@@ -1,25 +1,42 @@
-using StackExchange.Redis;
+
 
 namespace CurrencyExchange.Services;
 
 public class RedisService : IRedisService
 {
-    private IConnectionMultiplexer _redis;
-    private IDatabase _database;
+    private readonly IDatabase _database;
+    private readonly ILogger<RedisService> _logger;
 
-    public RedisService(IConnectionMultiplexer redis)
+    public RedisService(IConnectionMultiplexer redis, ILogger<RedisService> logger)
     {
-        _redis = redis;
-        _database = _redis.GetDatabase();
+        _database = redis.GetDatabase();
+        _logger = logger;
     }
 
-    public RedisValue Get(string key)
+    public bool Put(string key, string value)
     {
-        return _database.StringGet(key);
+        try
+        {
+            return _database.StringSet(key, value);
+        }
+        catch (Exception e)
+        {            
+            LoggingUtilities<RedisService>.LogInformation(e.ToString(), _logger, true);
+            return false;
+        }
     }
 
-    public void Put(string key, RedisValue value)
+    public T? Get<T>(string? key)
     {
-        _database.StringSet(key, value);
+        try
+        {
+            var value = _database.StringGet(key);
+            return !value.HasValue ? default : JsonSerializer.Deserialize<T>(value);
+        }
+        catch (Exception e)
+        {
+            LoggingUtilities<RedisService>.LogInformation(e.ToString(), _logger, true);
+            return default;
+        }
     }
 }

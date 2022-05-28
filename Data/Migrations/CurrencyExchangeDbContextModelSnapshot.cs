@@ -15,7 +15,6 @@ namespace CurrencyExchange.Data.Migrations
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
-#pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
@@ -49,16 +48,16 @@ namespace CurrencyExchange.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CurrencyExchangeHistoryId"), 1L, 1);
 
-                    b.Property<double>("AmountIn")
+                    b.Property<double?>("AmountIn")
                         .HasColumnType("float");
 
-                    b.Property<double>("AmountOut")
+                    b.Property<double?>("AmountOut")
                         .HasColumnType("float");
 
-                    b.Property<int>("ClientId")
+                    b.Property<int?>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<double>("ExchangRate")
+                    b.Property<double>("ExchangeRate")
                         .HasColumnType("float");
 
                     b.Property<DateTime>("ExecutedDate")
@@ -81,13 +80,10 @@ namespace CurrencyExchange.Data.Migrations
                 {
                     b.HasOne("CurrencyExchange.Models.Client", "Client")
                         .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClientId");
 
                     b.Navigation("Client");
                 });
-#pragma warning restore 612, 618
         }
     }
 }

@@ -1,10 +1,10 @@
 version: '3.4'
 
 services:
-  redis:
+  currency-exchange-redis:
     image: redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
       
   currency-exchange-db:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -13,7 +13,7 @@ services:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "P@ssw0rd"
     ports:
-      - 10433:1433
+      - "10433:1433"
 
   currency-exchange-backend:
     build:
@@ -21,7 +21,9 @@ services:
       dockerfile: ./DockerFile
     environment:
       CurrencyExchange_ConnectionStrings__DefaultConnection: "Server=currency-exchange-db;Database=currencyexchange;User Id=sa;Password=P@ssw0rd;"
+      CurrencyExchange_RedisConnectionString: "currency-exchange-redis,abortConnect=false,connectTimeout=30000,responseTimeout=30000"
     ports:
-      - 5000:80
+      - "5000:80"
     depends_on:
       - currency-exchange-db
+      - currency-exchange-redis

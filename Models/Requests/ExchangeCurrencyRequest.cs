@@ -8,5 +8,5 @@ public class ExchangeCurrencyRequest
 
     public string? FromCurrency { get; set; }
 
-    public string? ToCurrencies { get; set; }
+    public string? ToCurrency { get; set; }
 }

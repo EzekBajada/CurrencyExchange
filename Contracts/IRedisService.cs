@@ -1,10 +1,8 @@
-using StackExchange.Redis;
-
 namespace CurrencyExchange.Contracts;
 
 public interface IRedisService
 {
-    public void Put(string key, RedisValue value);
+    public bool Put(string key, string value);
 
-    public RedisValue Get(string key);
+    public T? Get<T>(string? key);
 }

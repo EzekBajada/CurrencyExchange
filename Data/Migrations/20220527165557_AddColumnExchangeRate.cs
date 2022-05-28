@@ -9,7 +9,7 @@ namespace CurrencyExchange.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<double>(
-                name: "ExchangRate",
+                name: "ExchangeRate",
                 table: "CurrencyExchangeHistories",
                 type: "float",
                 nullable: false,
@@ -19,7 +19,7 @@ namespace CurrencyExchange.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ExchangRate",
+                name: "ExchangeRate",
                 table: "CurrencyExchangeHistories");
         }
     }
