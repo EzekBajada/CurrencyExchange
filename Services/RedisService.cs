@@ -11,30 +11,30 @@ public class RedisService : IRedisService
         _logger = logger;
     }
 
-    public Task<bool> Put(string key, string value)
+    public async Task<bool> Put(string key, string value)
     {
         try
         {
-            return Task.FromResult(_database.StringSet(key, value));
+            return await _database.StringSetAsync(key, value);
         }
         catch (Exception e)
         {            
-            _logger.LogError(e, ErrorMessages.RedisPutError);
-            return Task.FromResult(false);
+            _logger.LogError(e, InfoErrorMessages.RedisPutError);
+            return await Task.FromResult(false);
         }
     }
 
-    public Task<T?> Get<T>(string? key)
+    public async Task<T?> Get<T>(string? key)
     {
         try
         {
-            var value = _database.StringGet(key);
-            return !value.HasValue ? Task.FromResult<T?>(default) : Task.FromResult(JsonSerializer.Deserialize<T>(value));
+            var value = await _database.StringGetAsync(key);
+            return !value.HasValue ? await Task.FromResult<T?>(default) : await Task.FromResult(JsonSerializer.Deserialize<T>(value));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.RedisGetError); 
-            return Task.FromException<T?>(e);
+            _logger.LogError(e, InfoErrorMessages.RedisGetError); 
+            return await Task.FromException<T?>(e);
         }
     }
 }

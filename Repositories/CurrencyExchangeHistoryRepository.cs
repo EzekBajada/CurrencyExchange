@@ -14,55 +14,55 @@ public class CurrencyExchangeHistoryRepository : IRepository<CurrencyExchangeHis
         _logger = logger;
     }
 
-    public Task<CurrencyExchangeHistory?> GetOneById(int? id)
+    public async Task<CurrencyExchangeHistory?> GetOneById(int? id)
     {
         try
         {
-            return Task.FromResult(_dbContext.CurrencyExchangeHistories?.FirstOrDefault(x => x.CurrencyExchangeHistoryId == id));
+            return await _dbContext.CurrencyExchangeHistories?.FirstOrDefaultAsync(x => x.CurrencyExchangeHistoryId == id)!;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.RepositoryGetError);
-            return Task.FromException<CurrencyExchangeHistory?>(e);
+            _logger.LogError(e, InfoErrorMessages.RepositoryGetError);
+            return await Task.FromException<CurrencyExchangeHistory?>(e);
         }
     }
 
-    public Task<IEnumerable<CurrencyExchangeHistory>?> GetMultipleByFilter(Func<CurrencyExchangeHistory, bool> filter)
+    public async Task<IEnumerable<CurrencyExchangeHistory>?> GetMultipleByFilter(Func<CurrencyExchangeHistory, bool> filter)
     {
         try
         {
-            return Task.FromResult(_dbContext.CurrencyExchangeHistories?.Where(filter));
+            return await Task.FromResult(_dbContext.CurrencyExchangeHistories?.Where(filter));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.RepositoryGetError);
-            return Task.FromException<IEnumerable<CurrencyExchangeHistory>?>(e);
+            _logger.LogError(e, InfoErrorMessages.RepositoryGetError);
+            return await Task.FromException<IEnumerable<CurrencyExchangeHistory>?>(e);
         }
     }
 
-    public Task AddOne(CurrencyExchangeHistory entity)
+    public async Task AddOne(CurrencyExchangeHistory entity)
     {
         try
         {
-            return Task.FromResult(_dbContext.Add(entity)) ;
+            await _dbContext.AddAsync(entity);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.RepositoryAddError);
-            return Task.FromException(e);
+            _logger.LogError(e, InfoErrorMessages.RepositoryAddError);
+            await Task.FromException(e);
         }
     }
 
-    public Task SaveDbChanges()
+    public async Task SaveDbChanges()
     {
         try
         {
-            return Task.FromResult(_dbContext.SaveChanges());
+           await _dbContext.SaveChangesAsync();
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.RepositorySaveError);
-            return Task.FromException(e);
+            _logger.LogError(e, InfoErrorMessages.RepositorySaveError);
+            await Task.FromException(e);
         }
     }
 }

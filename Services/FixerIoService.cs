@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.Web;
 
 namespace CurrencyExchange.Services;
@@ -22,28 +23,30 @@ public class FixerIoService : IFixerIoService
         {
             if (baseCurrency == null || symbols == null)
             {
-                _logger.LogError(ErrorMessages.FixerIoEmptyRequest);
+                _logger.LogError(InfoErrorMessages.FixerIoEmptyRequest);
                 return new LatestExchangeRatesResponse
                 {
                     Success = false,
-                    ErrorMessage = ErrorMessages.FixerIoEmptyRequest
+                    ErrorMessage = InfoErrorMessages.FixerIoEmptyRequest
                 };
             }
 
-            var uri = BuildUri($"{_fixerIoSettings.BaseUrl}/latest", new Dictionary<string, string>
+            var uri = await BuildUri($"{_fixerIoSettings.BaseUrl}/latest", new Dictionary<string, string>
             {
                 {"base", baseCurrency},
                 {"symbols", symbols}
             });
 
-            var response = await _httpClient.GetAsync(uri).Result.Content.ReadFromJsonAsync<LatestExchangeRatesResponse>();
-            _logger.LogInformation(ErrorMessages.FixerIoResponseLog, uri.ToString(), JsonSerializer.Serialize(response));
+            var httpResponseMessage = await _httpClient.GetAsync(uri);
+            var response = await httpResponseMessage.Content.ReadFromJsonAsync<LatestExchangeRatesResponse>();
+                
+            _logger.LogInformation(InfoErrorMessages.FixerIoResponseLog, uri.ToString(), JsonSerializer.Serialize(response));
 
             return response;
         }
         catch (Exception e)
         {
-            _logger.LogError(ErrorMessages.FixerIoFetchError);
+            _logger.LogError(InfoErrorMessages.FixerIoFetchError);
             return new LatestExchangeRatesResponse
             {
                 Success = false,
@@ -52,12 +55,12 @@ public class FixerIoService : IFixerIoService
         }
     }
 
-    private static Uri BuildUri(string endPointUri, Dictionary<string, string>? parameters)
+    private static async Task<Uri> BuildUri(string endPointUri, Dictionary<string, string>? parameters)
     {
         var uriBuilder = new UriBuilder(endPointUri);
         if (parameters == null || !parameters.Any()) return uriBuilder.Uri;
         
-        var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+        var query = await new Task<NameValueCollection>(() => HttpUtility.ParseQueryString(uriBuilder.Query));
         foreach (var param in parameters)
         {
             query[param.Key] = param.Value;

@@ -1,6 +1,3 @@
-using CurrencyExchange.Interfaces.RepositoryInterfaces;
-using CurrencyExchange.Models.Configurations;
-
 namespace CurrencyExchange.Services;
 
 public class ExchangeCurrencyService : IExchangeCurrencyService
@@ -34,11 +31,11 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
             var client = await _clientRepository.GetOneById(request.ClientId ?? default);
             if (client is null)
             {
-                _logger.LogError(ErrorMessages.ClientNotFound(request.ClientId));
+                _logger.LogError(InfoErrorMessages.ClientNotFound(request.ClientId));
                 return new ExchangeCurrencyResponse
                 {
                     Success = false,
-                    ErrorMessage = ErrorMessages.ClientNotFound(request.ClientId)
+                    ErrorMessage = InfoErrorMessages.ClientNotFound(request.ClientId)
                 };
             }
 
@@ -48,11 +45,11 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
             
             if (clientExchangeHistory?.Count() > _appSettings.MaxAllowedRequests)
             {
-                _logger.LogError(ErrorMessages.ExceededAllowedRequests(client.ClientName));
+                _logger.LogError(InfoErrorMessages.ExceededAllowedRequests(client.ClientName));
                 return new ExchangeCurrencyResponse
                 {
                     Success = false,
-                    ErrorMessage = ErrorMessages.ExceededAllowedRequests(client.ClientName)
+                    ErrorMessage = InfoErrorMessages.ExceededAllowedRequests(client.ClientName)
                 };
             }
             
@@ -67,19 +64,19 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
             }
             else
             {
-                currencyRate = _fixerIoService.GetCurrencyExchangeRate(request.FromCurrency ?? client?.BaseCurrency, request.ToCurrency).Result;
+                currencyRate = await _fixerIoService.GetCurrencyExchangeRate(request.FromCurrency ?? client?.BaseCurrency, request.ToCurrency);
                 
                 if(!await _redisService.Put($"{request.FromCurrency}_{request.ToCurrency}",
                        JsonSerializer.Serialize(currencyRate)))
                 {
-                    _logger.LogError(ErrorMessages.CurrencyRateCacheError);
+                    _logger.LogError(InfoErrorMessages.CurrencyRateCacheError);
                 }
             }
             
             // If success false means that the rate is not cached and fixerIo returned false
             if (currencyRate is {Success: false})
             {
-                var message = currencyRate?.ErrorMessage ?? ErrorMessages.FixerIoFetchError;
+                var message = currencyRate.ErrorMessage ?? InfoErrorMessages.FixerIoFetchError;
                 _logger.LogError(message);
                 
                 return new ExchangeCurrencyResponse
@@ -115,7 +112,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.ExchangeRateGeneralError);
+            _logger.LogError(e, InfoErrorMessages.ExchangeRateGeneralError);
             return new ExchangeCurrencyResponse
             {
                 Success = false,

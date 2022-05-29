@@ -1,6 +1,6 @@
 namespace CurrencyExchange.Utilities;
 
-public static class ErrorMessages
+public static class InfoErrorMessages
 {
     public static string ClientNotFound(int? clientId)
     {

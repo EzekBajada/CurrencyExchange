@@ -14,29 +14,29 @@ public class ClientRepository : IRepository<Client>
         _logger = logger;
     }
 
-    public Task<Client?> GetOneById(int? id)
+    public async Task<Client?> GetOneById(int? id)
     {
         try
         {
-            return Task.FromResult(_dbContext.Clients?.FirstOrDefault(x => x.ClientId == id));
+            return await _dbContext.Clients?.FirstOrDefaultAsync(x => x.ClientId == id)!;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.RepositoryGetError);
-            return Task.FromException<Client?>(e);
+            _logger.LogError(e, InfoErrorMessages.RepositoryGetError);
+            return await Task.FromException<Client?>(e);
         }        
     }
 
-    public Task<IEnumerable<Client>?> GetMultipleByFilter(Func<Client, bool> filter)
+    public async Task<IEnumerable<Client>?> GetMultipleByFilter(Func<Client, bool> filter)
     {
         try
         {
-            return Task.FromResult(_dbContext.Clients?.Where(filter));
+            return await Task.FromResult(_dbContext.Clients?.Where(filter));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.RepositoryGetError);
-            return Task.FromException<IEnumerable<Client>?>(e);
+            _logger.LogError(e, InfoErrorMessages.RepositoryGetError);
+            return await Task.FromException<IEnumerable<Client>?>(e);
         }
     }
 
@@ -48,7 +48,7 @@ public class ClientRepository : IRepository<Client>
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.RepositoryAddError);
+            _logger.LogError(e, InfoErrorMessages.RepositoryAddError);
             return Task.FromException(e);
         }
     }
@@ -61,7 +61,7 @@ public class ClientRepository : IRepository<Client>
         }
         catch (Exception e)
         {
-            _logger.LogError(e, ErrorMessages.RepositorySaveError);
+            _logger.LogError(e, InfoErrorMessages.RepositorySaveError);
             return Task.FromException(e);
         }
     }
