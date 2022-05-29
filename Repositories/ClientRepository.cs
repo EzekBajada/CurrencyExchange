@@ -1,6 +1,3 @@
-using System.Globalization;
-using CurrencyExchange.Interfaces.RepositoryInterfaces;
-
 namespace CurrencyExchange.Repositories;
 
 public class ClientRepository : IRepository<Client>
@@ -14,55 +11,23 @@ public class ClientRepository : IRepository<Client>
         _logger = logger;
     }
 
-    public async Task<Client?> GetOneById(int? id)
+    public async Task<Client?> GetOneByIdAsync(int? id)
     {
-        try
-        {
-            return await _dbContext.Clients?.FirstOrDefaultAsync(x => x.ClientId == id)!;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, InfoErrorMessages.RepositoryGetError);
-            return await Task.FromException<Client?>(e);
-        }        
+        return await _dbContext.Clients?.FirstOrDefaultAsync(x => x.ClientId == id)!;
     }
 
-    public async Task<IEnumerable<Client>?> GetMultipleByFilter(Func<Client, bool> filter)
+    public async Task<IEnumerable<Client>?> GetMultipleByFilterAsync(Func<Client, bool> filter)
     {
-        try
-        {
-            return await Task.FromResult(_dbContext.Clients?.Where(filter));
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, InfoErrorMessages.RepositoryGetError);
-            return await Task.FromException<IEnumerable<Client>?>(e);
-        }
+        return await Task.FromResult(_dbContext.Clients?.Where(filter));
     }
 
-    public Task AddOne(Client entity)
+    public async Task AddOneAsync(Client entity)
     {
-        try
-        {
-            return Task.FromResult(_dbContext.Add(entity)) ;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, InfoErrorMessages.RepositoryAddError);
-            return Task.FromException(e);
-        }
+        await _dbContext.AddAsync(entity) ;
     }
 
-    public Task SaveDbChanges()
+    public async Task SaveDbChangesAsync()
     {
-        try
-        {
-            return Task.FromResult(_dbContext.SaveChanges());
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, InfoErrorMessages.RepositorySaveError);
-            return Task.FromException(e);
-        }
+        await _dbContext.SaveChangesAsync();
     }
 }

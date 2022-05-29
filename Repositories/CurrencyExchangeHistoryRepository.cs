@@ -14,55 +14,23 @@ public class CurrencyExchangeHistoryRepository : IRepository<CurrencyExchangeHis
         _logger = logger;
     }
 
-    public async Task<CurrencyExchangeHistory?> GetOneById(int? id)
+    public async Task<CurrencyExchangeHistory?> GetOneByIdAsync(int? id)
     {
-        try
-        {
-            return await _dbContext.CurrencyExchangeHistories?.FirstOrDefaultAsync(x => x.CurrencyExchangeHistoryId == id)!;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, InfoErrorMessages.RepositoryGetError);
-            return await Task.FromException<CurrencyExchangeHistory?>(e);
-        }
+        return await _dbContext.CurrencyExchangeHistories?.FirstOrDefaultAsync(x => x.CurrencyExchangeHistoryId == id)!;
     }
 
-    public async Task<IEnumerable<CurrencyExchangeHistory>?> GetMultipleByFilter(Func<CurrencyExchangeHistory, bool> filter)
+    public async Task<IEnumerable<CurrencyExchangeHistory>?> GetMultipleByFilterAsync(Func<CurrencyExchangeHistory, bool> filter)
     {
-        try
-        {
-            return await Task.FromResult(_dbContext.CurrencyExchangeHistories?.Where(filter));
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, InfoErrorMessages.RepositoryGetError);
-            return await Task.FromException<IEnumerable<CurrencyExchangeHistory>?>(e);
-        }
+        return await Task.FromResult(_dbContext.CurrencyExchangeHistories?.Where(filter));
     }
 
-    public async Task AddOne(CurrencyExchangeHistory entity)
+    public async Task AddOneAsync(CurrencyExchangeHistory entity)
     {
-        try
-        {
-            await _dbContext.AddAsync(entity);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, InfoErrorMessages.RepositoryAddError);
-            await Task.FromException(e);
-        }
+        await _dbContext.AddAsync(entity);
     }
 
-    public async Task SaveDbChanges()
+    public async Task SaveDbChangesAsync()
     {
-        try
-        {
-           await _dbContext.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, InfoErrorMessages.RepositorySaveError);
-            await Task.FromException(e);
-        }
+        await _dbContext.SaveChangesAsync();
     }
 }

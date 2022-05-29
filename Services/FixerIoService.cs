@@ -17,7 +17,7 @@ public class FixerIoService : IFixerIoService
         _logger = logger;
     }
 
-    public async Task<LatestExchangeRatesResponse?> GetCurrencyExchangeRate(string? baseCurrency, string? symbols)
+    public async Task<LatestExchangeRatesResponse?> GetCurrencyExchangeRateAsync(string? baseCurrency, string? symbols)
     {
         try
         {
@@ -60,7 +60,7 @@ public class FixerIoService : IFixerIoService
         var uriBuilder = new UriBuilder(endPointUri);
         if (parameters == null || !parameters.Any()) return uriBuilder.Uri;
         
-        var query = await new Task<NameValueCollection>(() => HttpUtility.ParseQueryString(uriBuilder.Query));
+        var query =  await Task.Run(() => HttpUtility.ParseQueryString(uriBuilder.Query));
         foreach (var param in parameters)
         {
             query[param.Key] = param.Value;

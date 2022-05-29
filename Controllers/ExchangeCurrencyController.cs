@@ -18,7 +18,7 @@ public class ExchangeCurrencyController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> ExchangeCurrency(ExchangeCurrencyRequest request)
     {
-        var response = await _exchangeCurrencyService.ExchangeCurrencies(request);
+        var response = await _exchangeCurrencyService.ExchangeCurrenciesAsync(request);
 
         return !response.Success ? StatusCode(500, response) : Ok(response);
     }

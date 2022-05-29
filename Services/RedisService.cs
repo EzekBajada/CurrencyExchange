@@ -11,7 +11,7 @@ public class RedisService : IRedisService
         _logger = logger;
     }
 
-    public async Task<bool> Put(string key, string value)
+    public async Task<bool> PutAsync(string key, string value)
     {
         try
         {
@@ -24,7 +24,7 @@ public class RedisService : IRedisService
         }
     }
 
-    public async Task<T?> Get<T>(string? key)
+    public async Task<T?> GetAsync<T>(string? key)
     {
         try
         {

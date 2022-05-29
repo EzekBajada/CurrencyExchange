@@ -2,5 +2,5 @@ namespace CurrencyExchange.Interfaces.ServicesInterfaces;
 
 public interface IFixerIoService
 {
-    public Task<LatestExchangeRatesResponse?> GetCurrencyExchangeRate(string? baseCurrency, string? symbols);
+    public Task<LatestExchangeRatesResponse?> GetCurrencyExchangeRateAsync(string? baseCurrency, string? symbols);
 }

@@ -25,11 +25,5 @@ public static class InfoErrorMessages
 
     public const string RedisGetError = "Redis error when fetching";
 
-    public const string RepositoryGetError = "Error when getting data from database";
-    
-    public const string RepositoryAddError = "Error when inserting data in database";
-
-    public const string RepositorySaveError = "Error when saving changes in database";
-
     public const string ExchangeRateGeneralError = "Error when attempting to calculcate exchange rate";
 }

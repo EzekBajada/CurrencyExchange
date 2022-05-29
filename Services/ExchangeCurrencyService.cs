@@ -24,11 +24,11 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
         _appSettings = appSettings;
     }
 
-    public async Task<ExchangeCurrencyResponse> ExchangeCurrencies(ExchangeCurrencyRequest request)
+    public async Task<ExchangeCurrencyResponse> ExchangeCurrenciesAsync(ExchangeCurrencyRequest request)
     { 
         try
         {
-            var client = await _clientRepository.GetOneById(request.ClientId ?? default);
+            var client = await _clientRepository.GetOneByIdAsync(request.ClientId ?? default);
             if (client is null)
             {
                 _logger.LogError(InfoErrorMessages.ClientNotFound(request.ClientId));
@@ -40,7 +40,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
             }
 
             var clientExchangeHistory =
-                await _currencyExchangeHistoryRepository.GetMultipleByFilter(
+                await _currencyExchangeHistoryRepository.GetMultipleByFilterAsync(
                     row => row.ClientId == request.ClientId && row.ExecutedDate >= DateTime.Now.AddHours(-1));
             
             if (clientExchangeHistory?.Count() > _appSettings.MaxAllowedRequests)
@@ -53,7 +53,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
                 };
             }
             
-            var cachedExchangeRate = await _redisService.Get<LatestExchangeRatesResponse>($"{request.FromCurrency}_{request.ToCurrency}")!;
+            var cachedExchangeRate = await _redisService.GetAsync<LatestExchangeRatesResponse>($"{request.FromCurrency}_{request.ToCurrency}")!;
 
             LatestExchangeRatesResponse? currencyRate;
 
@@ -64,9 +64,9 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
             }
             else
             {
-                currencyRate = await _fixerIoService.GetCurrencyExchangeRate(request.FromCurrency ?? client?.BaseCurrency, request.ToCurrency);
+                currencyRate = await _fixerIoService.GetCurrencyExchangeRateAsync(request.FromCurrency ?? client?.BaseCurrency, request.ToCurrency);
                 
-                if(!await _redisService.Put($"{request.FromCurrency}_{request.ToCurrency}",
+                if(!await _redisService.PutAsync($"{request.FromCurrency}_{request.ToCurrency}",
                        JsonSerializer.Serialize(currencyRate)))
                 {
                     _logger.LogError(InfoErrorMessages.CurrencyRateCacheError);
@@ -90,7 +90,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
             var amountConverted = request.Amount * rate?.Value;
 
             // Add in history table
-            await _currencyExchangeHistoryRepository.AddOne(new CurrencyExchangeHistory
+            await _currencyExchangeHistoryRepository.AddOneAsync(new CurrencyExchangeHistory
             {
                 ClientId = request?.ClientId,
                 FromCurrency = request?.FromCurrency,
@@ -101,7 +101,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
                 ExecutedDate = DateTime.UtcNow
             });
             
-            await _currencyExchangeHistoryRepository.SaveDbChanges();
+            await _currencyExchangeHistoryRepository.SaveDbChangesAsync();
 
             return new ExchangeCurrencyResponse
             {
