@@ -1,4 +1,4 @@
-namespace CurrencyExchange.Contracts;
+namespace CurrencyExchange.Interfaces.ServicesInterfaces;
 
 public interface IFixerIoService
 {

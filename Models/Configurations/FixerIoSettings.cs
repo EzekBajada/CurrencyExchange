@@ -1,4 +1,4 @@
-namespace CurrencyExchange.Models.FixerIo;
+namespace CurrencyExchange.Models.Configurations;
 
 public class FixerIoSettings
 {

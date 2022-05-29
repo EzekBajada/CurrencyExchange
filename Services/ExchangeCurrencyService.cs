@@ -1,55 +1,62 @@
+using CurrencyExchange.Interfaces.RepositoryInterfaces;
+using CurrencyExchange.Models.Configurations;
+
 namespace CurrencyExchange.Services;
 
 public class ExchangeCurrencyService : IExchangeCurrencyService
 {
-    private readonly CurrencyExchangeDbContext _dbContext;
     private readonly IFixerIoService _fixerIoService;
     private readonly ILogger<ExchangeCurrencyService> _logger;
     private readonly IRedisService _redisService;
+    private readonly IRepository<Client> _clientRepository;
+    private readonly IRepository<CurrencyExchangeHistory> _currencyExchangeHistoryRepository;
+    private readonly AppSettings _appSettings;
 
-    public ExchangeCurrencyService(CurrencyExchangeDbContext dbContext, IFixerIoService fixerIoService, ILogger<ExchangeCurrencyService> logger, IRedisService redisService)
+    public ExchangeCurrencyService(IFixerIoService fixerIoService, 
+        ILogger<ExchangeCurrencyService> logger, 
+        IRedisService redisService,
+        IRepository<Client> clientRepository,
+        IRepository<CurrencyExchangeHistory> currencyExchangeHistoryRepository,
+        AppSettings appSettings)
     {
-        _dbContext = dbContext;
         _fixerIoService = fixerIoService;
         _logger = logger;
         _redisService = redisService;
+        _clientRepository = clientRepository;
+        _currencyExchangeHistoryRepository = currencyExchangeHistoryRepository;
+        _appSettings = appSettings;
     }
 
-    public ExchangeCurrencyResponse ExchangeCurrencies(ExchangeCurrencyRequest request)
-    {
+    public async Task<ExchangeCurrencyResponse> ExchangeCurrencies(ExchangeCurrencyRequest request)
+    { 
         try
         {
-            var client = _dbContext.Clients?.FirstOrDefault(x=> x.ClientId == request.ClientId);
+            var client = await _clientRepository.GetOneById(request.ClientId ?? default);
             if (client is null)
             {
-                const string message = "Client does not exist";
-                LoggingUtilities<ExchangeCurrencyService>.LogInformation(message, _logger, true);
-
+                _logger.LogError(ErrorMessages.ClientNotFound(request.ClientId));
                 return new ExchangeCurrencyResponse
                 {
                     Success = false,
-                    ErrorMessage = message
+                    ErrorMessage = ErrorMessages.ClientNotFound(request.ClientId)
                 };
             }
-            
-            var clientExchangeHistory = _dbContext.CurrencyExchangeHistories?
-                .Where(x => x.ClientId == request.ClientId
-                    && x.ExecutedDate >= DateTime.Now.AddHours(-1))
-                .ToList();
 
-            if (clientExchangeHistory is {Count: >= 10})
+            var clientExchangeHistory =
+                await _currencyExchangeHistoryRepository.GetMultipleByFilter(
+                    row => row.ClientId == request.ClientId && row.ExecutedDate >= DateTime.Now.AddHours(-1));
+            
+            if (clientExchangeHistory?.Count() > _appSettings.MaxAllowedRequests)
             {
-                const string message = "Exceeded maximum exchanges for 1 hour";
-                LoggingUtilities<ExchangeCurrencyService>.LogInformation(message, _logger, true);
-
+                _logger.LogError(ErrorMessages.ExceededAllowedRequests(client.ClientName));
                 return new ExchangeCurrencyResponse
                 {
                     Success = false,
-                    ErrorMessage = message
+                    ErrorMessage = ErrorMessages.ExceededAllowedRequests(client.ClientName)
                 };
             }
             
-            var cachedExchangeRate = _redisService.Get<LatestExchangeRatesResponse>($"{request.FromCurrency}_{request.ToCurrency}");
+            var cachedExchangeRate = await _redisService.Get<LatestExchangeRatesResponse>($"{request.FromCurrency}_{request.ToCurrency}")!;
 
             LatestExchangeRatesResponse? currencyRate;
 
@@ -62,18 +69,19 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
             {
                 currencyRate = _fixerIoService.GetCurrencyExchangeRate(request.FromCurrency ?? client?.BaseCurrency, request.ToCurrency).Result;
                 
-                if(!_redisService.Put($"{request.FromCurrency}_{request.ToCurrency}",
+                if(!await _redisService.Put($"{request.FromCurrency}_{request.ToCurrency}",
                        JsonSerializer.Serialize(currencyRate)))
                 {
-                    LoggingUtilities<ExchangeCurrencyService>.LogInformation("Currency rate could not be cached", _logger, true);
+                    _logger.LogError(ErrorMessages.CurrencyRateCacheError);
                 }
             }
             
-            if (currencyRate is not {Success: true})
+            // If success false means that the rate is not cached and fixerIo returned false
+            if (currencyRate is {Success: false})
             {
-                var message = currencyRate?.ErrorMessage ?? "Currency rate could not be fetched: FixerIo error";
-                LoggingUtilities<ExchangeCurrencyService>.LogInformation(message, _logger, true);
-
+                var message = currencyRate?.ErrorMessage ?? ErrorMessages.FixerIoFetchError;
+                _logger.LogError(message);
+                
                 return new ExchangeCurrencyResponse
                 {
                     Success = false,
@@ -81,34 +89,33 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
                 };
             }
 
-            var rate = currencyRate.Rates!.FirstOrDefault();
-            var amountConverted = request.Amount * rate.Value;
+            var rate = currencyRate?.Rates!.FirstOrDefault();
+            var amountConverted = request.Amount * rate?.Value;
 
             // Add in history table
-            _dbContext.CurrencyExchangeHistories?.Add(new CurrencyExchangeHistory
+            await _currencyExchangeHistoryRepository.AddOne(new CurrencyExchangeHistory
             {
                 ClientId = request?.ClientId,
                 FromCurrency = request?.FromCurrency,
-                ToCurrency = rate.Key,
-                ExchangeRate = rate.Value,
+                ToCurrency = rate?.Key,
+                ExchangeRate = rate?.Value,
                 AmountIn = request?.Amount,
                 AmountOut = amountConverted,
                 ExecutedDate = DateTime.UtcNow
             });
-
-            _dbContext.SaveChanges();
+            
+            await _currencyExchangeHistoryRepository.SaveDbChanges();
 
             return new ExchangeCurrencyResponse
             {
                 ClientId = request?.ClientId,
-                CurrencyConverted = new ConvertedCurrency(request?.Amount * currencyRate.Rates!.FirstOrDefault().Value, request?.FromCurrency!, rate.Key, rate.Value),
+                CurrencyConverted = new ConvertedCurrency(request?.Amount * currencyRate?.Rates!.FirstOrDefault().Value, request?.FromCurrency!, rate?.Key, rate?.Value),
                 Success = true
             };
         }
         catch (Exception e)
         {
-            LoggingUtilities<ExchangeCurrencyService>.LogInformation(e.ToString(), _logger, true);
-
+            _logger.LogError(e, ErrorMessages.ExchangeRateGeneralError);
             return new ExchangeCurrencyResponse
             {
                 Success = false,

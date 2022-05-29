@@ -1,16 +1,18 @@
 global using System;
-global using CurrencyExchange.Contracts;
 global using CurrencyExchange.DbContext;
-global using CurrencyExchange.Models;
-global using CurrencyExchange.Models.FixerIo;
+global using CurrencyExchange.Models.DatabaseModels;
 global using CurrencyExchange.Models.Requests;
 global using CurrencyExchange.Models.Responses;
 global using CurrencyExchange.Services;
 global using CurrencyExchange.Utilities;
+global using CurrencyExchange.Interfaces.ServicesInterfaces;
 global using Microsoft.EntityFrameworkCore;
 global using System.Text.Json;
 global using StackExchange.Redis;
+global using CurrencyExchange.Interfaces.RepositoryInterfaces;
+global using CurrencyExchange.Models.Configurations;
 
+using CurrencyExchange.Repositories;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,10 +25,15 @@ IConfiguration config = new ConfigurationBuilder()
 // Add services to the container.
 builder.Services.Configure<FixerIoSettings>(config.GetSection(nameof(FixerIoSettings)));
 builder.Services.AddSingleton(x => x.GetRequiredService<IOptions<FixerIoSettings>>().Value);
+builder.Services.Configure<AppSettings>(config.GetSection(nameof(AppSettings)));
+builder.Services.AddSingleton(x => x.GetRequiredService<IOptions<AppSettings>>().Value);
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(config.GetSection("RedisConnectionString").Value));
 builder.Services.AddSingleton<IRedisService, RedisService>();
 builder.Services.AddScoped<IFixerIoService, FixerIoService>();
 builder.Services.AddScoped<IExchangeCurrencyService, ExchangeCurrencyService>();
+builder.Services.AddScoped<IRepository<Client>, ClientRepository>();
+builder.Services.AddScoped<IRepository<CurrencyExchangeHistory>, CurrencyExchangeHistoryRepository>();
 
 builder.Services.AddLogging(loggingBuilder =>
   {

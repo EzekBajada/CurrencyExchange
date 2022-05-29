@@ -1,4 +1,4 @@
-namespace CurrencyExchange.Models;
+namespace CurrencyExchange.Models.DatabaseModels;
 
 public class CurrencyExchangeHistory
 {
@@ -12,7 +12,7 @@ public class CurrencyExchangeHistory
 
     public string? ToCurrency { get; set; }
 
-    public double ExchangeRate { get; set; }
+    public double? ExchangeRate { get; set; }
 
     public double? AmountIn { get; set; }
 

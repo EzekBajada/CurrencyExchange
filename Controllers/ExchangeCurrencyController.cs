@@ -1,3 +1,5 @@
+using CurrencyExchange.Interfaces;
+using CurrencyExchange.Interfaces.ServicesInterfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.Controllers;
@@ -14,9 +16,9 @@ public class ExchangeCurrencyController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult ExchangeCurrency(ExchangeCurrencyRequest request)
+    public async Task<IActionResult> ExchangeCurrency(ExchangeCurrencyRequest request)
     {
-        var response = _exchangeCurrencyService.ExchangeCurrencies(request);
+        var response = await _exchangeCurrencyService.ExchangeCurrencies(request);
 
         return !response.Success ? StatusCode(500, response) : Ok(response);
     }

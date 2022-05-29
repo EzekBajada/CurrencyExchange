@@ -1,5 +1,4 @@
 using System.Web;
-using System.Text.Json;
 
 namespace CurrencyExchange.Services;
 
@@ -23,13 +22,11 @@ public class FixerIoService : IFixerIoService
         {
             if (baseCurrency == null || symbols == null)
             {
-                var message = "Currency rate could be fetched: Request Empty";
-                LoggingUtilities<FixerIoService>.LogInformation(message, _logger, true);
-
+                _logger.LogError(ErrorMessages.FixerIoEmptyRequest);
                 return new LatestExchangeRatesResponse
                 {
                     Success = false,
-                    ErrorMessage = message
+                    ErrorMessage = ErrorMessages.FixerIoEmptyRequest
                 };
             }
 
@@ -40,14 +37,13 @@ public class FixerIoService : IFixerIoService
             });
 
             var response = await _httpClient.GetAsync(uri).Result.Content.ReadFromJsonAsync<LatestExchangeRatesResponse>();
-            LoggingUtilities<FixerIoService>.LogInformation($"FixerIoResponse: {JsonSerializer.Serialize(response)} ", _logger);
+            _logger.LogInformation(ErrorMessages.FixerIoResponseLog, uri.ToString(), JsonSerializer.Serialize(response));
 
             return response;
         }
         catch (Exception e)
         {
-            LoggingUtilities<FixerIoService>.LogInformation(e.ToString(), _logger, true);
-
+            _logger.LogError(ErrorMessages.FixerIoFetchError);
             return new LatestExchangeRatesResponse
             {
                 Success = false,

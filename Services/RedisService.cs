@@ -1,5 +1,3 @@
-
-
 namespace CurrencyExchange.Services;
 
 public class RedisService : IRedisService
@@ -13,30 +11,30 @@ public class RedisService : IRedisService
         _logger = logger;
     }
 
-    public bool Put(string key, string value)
+    public Task<bool> Put(string key, string value)
     {
         try
         {
-            return _database.StringSet(key, value);
+            return Task.FromResult(_database.StringSet(key, value));
         }
         catch (Exception e)
         {            
-            LoggingUtilities<RedisService>.LogInformation(e.ToString(), _logger, true);
-            return false;
+            _logger.LogError(e, ErrorMessages.RedisPutError);
+            return Task.FromResult(false);
         }
     }
 
-    public T? Get<T>(string? key)
+    public Task<T?> Get<T>(string? key)
     {
         try
         {
             var value = _database.StringGet(key);
-            return !value.HasValue ? default : JsonSerializer.Deserialize<T>(value);
+            return !value.HasValue ? Task.FromResult<T?>(default) : Task.FromResult(JsonSerializer.Deserialize<T>(value));
         }
         catch (Exception e)
         {
-            LoggingUtilities<RedisService>.LogInformation(e.ToString(), _logger, true);
-            return default;
+            _logger.LogError(e, ErrorMessages.RedisGetError); 
+            return Task.FromException<T?>(e);
         }
     }
 }
