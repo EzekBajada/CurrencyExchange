@@ -1,5 +1,3 @@
-using CurrencyExchange.Interfaces;
-using CurrencyExchange.Interfaces.ServicesInterfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyExchange.Controllers;
