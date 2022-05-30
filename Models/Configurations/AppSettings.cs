@@ -2,5 +2,5 @@ namespace CurrencyExchange.Models.Configurations;
 
 public class AppSettings
 {
-    public int MaxAllowedRequests { get; set; }
+    public virtual int MaxAllowedRequests { get; init; }
 }

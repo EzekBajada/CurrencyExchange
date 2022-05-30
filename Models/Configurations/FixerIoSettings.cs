@@ -2,7 +2,7 @@ namespace CurrencyExchange.Models.Configurations;
 
 public class FixerIoSettings
 {
-    public string? ApiKey { get; init; }
+    public virtual string? ApiKey { get; init; }
 
-    public string? BaseUrl { get; init; }
+    public virtual string? BaseUrl { get; init; }
 }

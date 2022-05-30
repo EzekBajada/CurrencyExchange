@@ -41,7 +41,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
 
             var clientExchangeHistory =
                 await _currencyExchangeHistoryRepository.GetMultipleByFilterAsync(
-                    row => row.ClientId == request.ClientId && row.ExecutedDate >= DateTime.Now.AddHours(-1));
+                    row => row.ClientId == request.ClientId && row.ExecutedDate >= DateTime.UtcNow.AddHours(-1));
             
             if (clientExchangeHistory?.Count() > _appSettings.MaxAllowedRequests)
             {
