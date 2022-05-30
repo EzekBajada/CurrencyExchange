@@ -8,4 +8,4 @@ Apart from the following brief overview there is also a swagger documentation at
 
 The CurrencyExchange microservice pattern is based on MVC and the repository pattern. Task-based asynchronous pattern (TAP) was also used. Configurations were done in the appsettings for scalable options. Generics were also used to provide less reduntant code.
 
-Unit testing was done aswell to provide insight the module still works from future upgrades on the module.
+Unit testing was done aswell for regression testing.
