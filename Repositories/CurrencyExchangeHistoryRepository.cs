@@ -1,6 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using CurrencyExchange.Interfaces.RepositoryInterfaces;
-
 namespace CurrencyExchange.Repositories;
 
 public class CurrencyExchangeHistoryRepository : IRepository<CurrencyExchangeHistory>
