@@ -28,6 +28,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
     { 
         try
         {
+            // Check if client exists
             var client = await _clientRepository.GetOneByIdAsync(request.ClientId ?? default);
             if (client is null)
             {
@@ -39,6 +40,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
                 };
             }
 
+            // Get exchange trades history in the last hour
             var clientExchangeHistory =
                 await _currencyExchangeHistoryRepository.GetMultipleByFilterAsync(
                     row => row.ClientId == request.ClientId && row.ExecutedDate >= DateTime.UtcNow.AddHours(-1));
@@ -53,6 +55,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
                 };
             }
             
+            // Check if exchange rate is cached
             var cachedExchangeRate = await _redisService.GetAsync<LatestExchangeRatesResponse>($"{request.FromCurrency}_{request.ToCurrency}")!;
 
             LatestExchangeRatesResponse? currencyRate;
@@ -64,6 +67,7 @@ public class ExchangeCurrencyService : IExchangeCurrencyService
             }
             else
             {
+                // If not cached get it from FixerIo
                 currencyRate = await _fixerIoService.GetCurrencyExchangeRateAsync(request.FromCurrency ?? client?.BaseCurrency, request.ToCurrency);
                 
                 if(!await _redisService.PutAsync($"{request.FromCurrency}_{request.ToCurrency}",
