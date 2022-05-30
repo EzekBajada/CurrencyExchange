@@ -15,7 +15,7 @@ public class RedisService : IRedisService
     {
         try
         {
-            return await _database.StringSetAsync(key, value);
+            return await _database.StringSetAsync(key, value, TimeSpan.FromMinutes(30));
         }
         catch (Exception e)
         {            
